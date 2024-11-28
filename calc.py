@@ -4,57 +4,75 @@ for i in primer:
         primer = primer[:primer.index(i)] + primer[primer.index(i)+1:]
 
 znaki = ['+', '-', '*', '/']
+primer1 = list(primer).copy()
 primer = list(primer)
 oper = 0
 flag = False
-opers = []
+tabs = []
+l = 0
+k = 0
 
-for i in primer:
+for i in primer1:
     if i in znaki:
+        tabs.append(primer1.index(i)+k)
         oper += 1
+        k += 1
+        primer1.remove(i)
 
-'''
-for i in primer:
-    if flag == True:
-        primer.insert(primer.index(i)-1, ' ')
-        primer.insert(primer.index(i), ' ')
-        flag = False
-    if i in znaki:
-        flag = True
-        continue
-'''
-
+for i in tabs:
+    primer.insert(i+l+1, ' ')
+    primer.insert(i+l, ' ')
+    l += 2
 
 primer = ''.join(primer)
+primer = primer.split()
 
-for i in primer:
-    if i in znaki:
-        primer = primer.split(i)
-        opers.append(i)
-
-print(opers)
-print(primer)
-
-'''
-def sum(b):
+def sum(b: list) -> list:
     res = (int(b[0]) + int(b[2]))
-    primer = primer[3:]
-    primer = (res + primer)
-    return primer
-def razn(b):
-    return(int(b[0]) - int(b[2]))
-def proisv(b):
-    return(int(b[0]) * int(b[2]))
-def chast(b):
-    return(int(b[0]) / int(b[2]))
+    if len(b) >3:
+        b = b[3:]
+        print(b)
+    else:
+        b.clear()
+    b.insert(0, res)
+    list = b.copy()
+    return list
+
+def razn(b: list):
+    res = (int(b[0]) - int(b[2]))
+    if len(b) >3:
+        b = b[3:]
+    else:
+        b.clear()
+    b.insert(0, res)
+    return b
+
+def proisv(b: list):
+    res = (int(b[0]) * int(b[2]))
+    if len(b) >3:
+        b = b[3:]
+    else:
+        b.clear()
+    b.insert(0, res)
+    return b
+
+def chast(b: list):
+    res = (int(b[0]) / int(b[2]))
+    if len(b) >3:
+        b = b[3:]
+    else:
+        b.clear()
+    b.insert(0, res)
+    return b
 
 for i in range(oper):
     if primer[1] == '+':
         sum(primer)
-    if primer[1] == '-':
+    elif primer[1] == '-':
         razn(primer)
-    if primer[1] == '*':
+    elif primer[1] == '*':
         proisv(primer)
-    if primer[1] == '/':
+    elif primer[1] == '/':
         chast(primer)
-'''
+
+print(primer)
