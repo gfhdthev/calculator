@@ -7,7 +7,6 @@ znaki = ['+', '-', '*', '/']
 primer1 = list(primer).copy()
 primer = list(primer)
 oper = 0
-flag = False
 tabs = []
 l = 0
 k = 0
@@ -38,7 +37,7 @@ def sum(b: list) -> list:
     list = b.copy()
     return list
 
-def razn(b: list):
+def razn(b: list) -> list:
     res = (int(b[0]) - int(b[2]))
     if len(b) >3:
         b = b[3:]
@@ -47,7 +46,7 @@ def razn(b: list):
     b.insert(0, res)
     return b
 
-def proisv(b: list):
+def proisv(b: list) -> list:
     res = (int(b[0]) * int(b[2]))
     if len(b) >3:
         b = b[3:]
@@ -56,7 +55,7 @@ def proisv(b: list):
     b.insert(0, res)
     return b
 
-def chast(b: list):
+def chast(b: list) -> list:
     res = (int(b[0]) / int(b[2]))
     if len(b) >3:
         b = b[3:]
