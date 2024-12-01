@@ -1,63 +1,51 @@
 primer = input('Введите выражение: ')
+
 for i in primer: #проверяем всю строку на пробелы
     if i == ' ': 
         primer = primer[:primer.index(i)] + primer[primer.index(i)+1:] #вырезаем каждый пробел
 
-znaki = ['+', '-', '*', '/', '^'] #дабаляем знаки действий
+'''ПЕРЕМЕННЫЕ'''
+
+znaki = ['+', '-', '*', '/', '^', '(', ')'] #добаляем знаки действий
 not_prior_znaki = ['+', '-']
 prior_znaki = ['*', '/', '^']
 primer = list(primer) #переводим нашу строку в список
-primer1 = primer.copy() #копируем наш список
 tabs = [] #тут будут храниться индексы, на которых стоят знаки
-posled = [] #указываем последовательность выполнения действий
+posled = [] #указываем последовательность выполнения действий не в скобках
+posled_skob = [] #тут будут храниться действия в скобках
 k = 0 
-flag = False
 
-for i in primer1:
-    if i in znaki: #если элемент в знаках
-        if i == '-' and primer1.index(i) == 0: #игнорируем первый минус, чтобы его не заносили в tabs
-            k += 1
-            primer1.remove(i)
-        else:
-            tabs.append(primer1.index(i)+k) #то мы добваляем его индекс + k
-            k += 1 #k нам нужна, потому что, когда мы удаляем индекс, то наш список уменьшается в длину на 1 и индексы сдвигаются
-            #а с помощью k мы компенсируем эти удаления
-            primer1.remove(i) #и удаляем наш знак
+'''ФУНКЦИИ'''
 
-k = 0 #очищаем переменную
+def prior(b: list, posl: list) -> list:
+    flag = False
 
-for i in tabs: #перебираем индексы, на которых стоят знаки
-    primer.insert(i+k+1, ' ') #добавляем пробел после этого знака
-    primer.insert(i+k, ' ') #и перед
-    k += 2 #l нам нужны, потому что, когда мы добавляем 2 пробела, то наш список увеличивается на 2
+    for i in b:
+        if i in prior_znaki: #для начала добавим индексы приоритетных знаков
+            if len(posl) == 0: #если список пустой
+                posl.append(b.index(i)) #то добавляем 
 
-primer = ''.join(primer) #переаводим все в строку
-primer = primer.split() #и иразделяем эту строку на числа и знаки
+            else:
+                for l in posl: #перебираем элементы в списке
 
-for i in primer:
-    if i in prior_znaki: #для начала добавим индексы приоритетных знаков
-        if len(posled) == 0: #если список пустой
-            posled.append(primer.index(i)) #то добавляем 
+                    if b[l] in not_prior_znaki: #если там есть знак + или - 
+                        posl.insert(posl.index(l), b.index(i)) #то добавляем приоритетный знак перед ним
+                        flag = True #флаг, чтобы понять, что мы уже вставили индекс
+                        break # и выходим из цикла
 
-        else:
-            for l in posled: #перебираем элементы в списке
+                if flag is False:
+                    posl.append(b.index(i)) #если такого знака нету, то добавляем на последнее место
 
-                if primer[l] in not_prior_znaki: #если там есть знак + или - 
-                    posled.insert(posled.index(l), primer.index(i)) #то добавляем приоритетный знак перед ним
-                    flag = True #флаг, чтобы понять, что мы уже вставили индекс
-                    break # и выходим из цикла
+        if i in not_prior_znaki:
+            if len(posl) == 0: #если список пустой
+                posl.append(b.index(i)) #то добавляем на перове место
 
-            if flag is False:
-                posled.append(primer.index(i)) #если такого знака нету, то добавляем на последнее место
+            else:
+                posl.append(b.index(i))
 
-    if i in not_prior_znaki:
-        if len(posled) == 0: #если список пустой
-            posled.append(primer.index(i)) #то добавляем на перове место
+        flag = False #возвращаем его в прошлое значение
 
-        else:
-            posled.append(primer.index(i))
-
-    flag = False #возвращаем его в прошлое значение
+    return posl
 
 def sum(b: list, a: int) -> list: #создаем функцию
     res = (float(b[a-1]) + float(b[a+1])) #и делаем первое действие
@@ -113,6 +101,86 @@ def stepen(b: list, a: int) -> list:
         b.clear() #если не позволяет, то очищаем этот список
     b.insert(a-1, res) #и на преове место вставляем наш результат
     return b #и возвращаем наш список
+
+'''РАЗДЕЛЯЕМ ЧИСЛА И ЗНАКИ ПРОБЕЛАМИ'''
+
+for i in range(len(primer)):
+    if primer[i] in znaki: #если элемент в знаках
+        if primer[i] == '-' and i == 0: #игнорируем первый минус, чтобы его не заносили в tabs
+            continue
+        else:
+            tabs.append(i) #то мы добавляем его индекс
+
+for i in range(len(tabs)): #перебираем индексы, на которых стоят знаки
+    if tabs[i] - tabs[i-1] == 1: #если знаки идут подряд
+        if primer[tabs[i] + k] == '-': #и второй знак это минус
+            tabs.pop(i) #то мы просто удаляем его индекс из списка
+
+        else:
+            primer.insert(tabs[i]+k+1, ' ') #если не минус, то добавляем пробелы
+            primer.insert(tabs[i]+k, ' ')
+    else:
+        primer.insert(tabs[i]+k+1, ' ') #если не идут подряд, то добавляем пробелы
+        primer.insert(tabs[i]+k, ' ')
+    k += 2 #l нам нужны, потому что, когда мы добавляем 2 пробела, то наш список увеличивается на 2
+
+primer = ''.join(primer) #переаводим все в строку
+primer = primer.split() #и иразделяем эту строку на числа и знаки
+
+'''РАССТАВЛЯЕМ ПРИОРИТЕТ СКОБОК'''
+
+while '(' in primer:
+    k = -1 #устанавливаем k
+    #n = 0
+    
+    for i in primer:
+        if i == '(':
+            if k == -1: #проверяем, чтобы это была первая скобка
+                ind_s = primer.index(i) #берем начало скобки
+                k += 1 #k нам нужна, чтобы знать, сколько скобок пропустить, до закрытия нужной. Для этого мы и ставили -1,
+                #чтобы не пропускать скобку, если она одна
+            else:
+                k += 1 #если это не первая скобка, то просто добавляем значение, чтобы ее пропустить
+
+        elif i == ')':
+            if k == 0: #проверяем, чтобы эта была именно та скобка, которая закрывает нужную
+                ind_f = primer.index(i) #берем конец скобки
+            else:
+                k -= 1
+
+    line = primer[ind_s+1:ind_f] #берем следующий от пеовй скобки индекс
+
+    #for i in line:
+    #    if i not in znaki:
+    #        n += 1 #смотрим, сколько элементов в выбранной скобке
+
+    #if n > 1:
+    primer.pop(ind_f) #удаляем скобки
+    primer.pop(ind_s) 
+
+        #posled_skob = prior(line, posled_skob) #получаем последовательность действи  в скобках
+
+    #else:
+    #    primer.pop(ind_f) #удаляем скобки
+    #    primer.pop(ind_s) 
+
+for i in range(len(posled_skob)):
+    posled_skob[i] = posled_skob[i] + ind_s #т.к. мы считали операции в скобках отдельно, то надо дать им правильные индексы
+    #для этого добавляем к них индекс начала скобок
+
+primer1 = primer.copy() #копируем ввод уже без скобок
+
+for i in posled_skob:
+    primer1.insert(i, '!') #и заменяем те знаки, которые мы уже занесли в последовательность на !
+    primer1.pop(i+1) #чтобы не заносить их дважды
+
+'''РАССТАВЛЯЕМ ПРИОРИТЕТ ЗНАКОВ'''
+
+posled = prior(primer1, posled) #создаем общую последовательность из индексов
+
+posled = posled_skob + posled #объединяем и получаем общую последовательность
+
+'''СЧИТАЕМ РЕЗУЛЬТАТ'''
 
 for i in posled:
     znak = primer[i]
