@@ -13,6 +13,7 @@ primer = list(primer) #переводим нашу строку в список
 tabs = [] #тут будут храниться индексы, на которых стоят знаки
 posled = [] #указываем последовательность выполнения действий не в скобках
 posled_skob = [] #тут будут храниться действия в скобках
+posled_ob = []
 k = 0 
 
 '''ФУНКЦИИ'''
@@ -24,10 +25,8 @@ def prior(b: list, posl: list) -> list:
         if i in prior_znaki: #для начала добавим индексы приоритетных знаков
             if len(posl) == 0: #если список пустой
                 posl.append(b.index(i)) #то добавляем 
-
             else:
                 for l in posl: #перебираем элементы в списке
-
                     if b[l] in not_prior_znaki: #если там есть знак + или - 
                         posl.insert(posl.index(l), b.index(i)) #то добавляем приоритетный знак перед ним
                         flag = True #флаг, чтобы понять, что мы уже вставили индекс
@@ -46,6 +45,37 @@ def prior(b: list, posl: list) -> list:
         flag = False #возвращаем его в прошлое значение
 
     return posl
+
+def del_skob(b: list) -> list:
+    posled_skob = [] #тут будут храниться действия в скобках
+    k = -1
+    n = 0
+
+    for i in b:
+        if i == '(':
+            if k  == -1:
+                ind_s = b.index(i)
+                k += 1
+            else:
+                k += 1
+        if i == ')':
+            if k == 0:
+                ind_f = b.index(i)
+            else:
+                k -= 1
+
+    line = b[ind_s+1:ind_f] #составляем выражение внутри скобок
+
+    b.pop(ind_f) #удаляем скобки
+    b.pop(ind_s)
+
+    posl = prior(line, posled_skob)
+
+    for i in posl:
+        i += ind_s #добавляем индекс начала скобок, чтобы компенсировать то, что мы брали скобку
+
+    return b
+
 
 def sum(b: list, a: int) -> list: #создаем функцию
     res = (float(b[a-1]) + float(b[a+1])) #и делаем первое действие
@@ -128,10 +158,10 @@ primer = ''.join(primer) #переаводим все в строку
 primer = primer.split() #и иразделяем эту строку на числа и знаки
 
 '''РАССТАВЛЯЕМ ПРИОРИТЕТ СКОБОК'''
-
+'''
 while '(' in primer:
     k = -1 #устанавливаем k
-    #n = 0
+    n = 0
     
     for i in primer:
         if i == '(':
@@ -150,39 +180,41 @@ while '(' in primer:
 
     line = primer[ind_s+1:ind_f] #берем следующий от пеовй скобки индекс
 
-    #for i in line:
-    #    if i not in znaki:
-    #        n += 1 #смотрим, сколько элементов в выбранной скобке
+    for i in line:
+        if i not in znaki:
+            n += 1 #смотрим, сколько элементов в выбранной скобке
 
-    #if n > 1:
-    primer.pop(ind_f) #удаляем скобки
-    primer.pop(ind_s) 
+    if n > 1:
+        primer.pop(ind_f) #удаляем скобки
+        primer.pop(ind_s) 
 
-        #posled_skob = prior(line, posled_skob) #получаем последовательность действи  в скобках
+        posled_skob = prior(line, posled_skob) #получаем последовательность действи  в скобках
 
-    #else:
-    #    primer.pop(ind_f) #удаляем скобки
-    #    primer.pop(ind_s) 
+    else:
+        primer.pop(ind_f) #удаляем скобки
+        primer.pop(ind_s) 
+'''
+while '(' in primer:
+    primer = del_skob(primer)
 
-for i in range(len(posled_skob)):
-    posled_skob[i] = posled_skob[i] + ind_s #т.к. мы считали операции в скобках отдельно, то надо дать им правильные индексы
-    #для этого добавляем к них индекс начала скобок
 
 primer1 = primer.copy() #копируем ввод уже без скобок
 
 for i in posled_skob:
     primer1.insert(i, '!') #и заменяем те знаки, которые мы уже занесли в последовательность на !
     primer1.pop(i+1) #чтобы не заносить их дважды
-
+print(primer1)
 '''РАССТАВЛЯЕМ ПРИОРИТЕТ ЗНАКОВ'''
 
 posled = prior(primer1, posled) #создаем общую последовательность из индексов
-
-posled = posled_skob + posled #объединяем и получаем общую последовательность
+print(posled_skob)
+print(posled)
+posled_ob = posled_skob + posled #объединяем и получаем общую последовательность
 
 '''СЧИТАЕМ РЕЗУЛЬТАТ'''
-
-for i in posled:
+print(primer)
+print(posled_ob)
+for i in posled_ob:
     znak = primer[i]
     for l in primer:
         if l == znak: #перебираем знаки приеритета в элементах списка
