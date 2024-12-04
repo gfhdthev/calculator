@@ -24,25 +24,34 @@ def prior(b: list, posl: list) -> list:
     flag = False
 
     for i in b:
+        ind = b.index(i)
         if i in prior_znaki: #для начала добавим индексы приоритетных знаков
             if len(posl) == 0: #если список пустой
                 posl.append(b.index(i)) #то добавляем 
+                #b.insert(ind, '!')
+                #b.pop(ind+1)
+
             else:
                 for l in posl: #перебираем элементы в списке
                     if b[l] in not_prior_znaki: #если там есть знак + или - 
                         posl.insert(posl.index(l), b.index(i)) #то добавляем приоритетный знак перед ним
+                        #b.insert(ind, '!')
+                        #b.pop(ind + 1)
+
                         flag = True #флаг, чтобы понять, что мы уже вставили индекс
                         break # и выходим из цикла
 
                 if flag is False:
                     posl.append(b.index(i)) #если такого знака нету, то добавляем на последнее место
+                    #b.insert(ind, '!')
+                    #b.pop(ind + 1)
+
 
         if i in not_prior_znaki:
-            if len(posl) == 0: #если список пустой
-                posl.append(b.index(i)) #то добавляем на перове место
-
-            else:
                 posl.append(b.index(i))
+                #b.insert(ind, '!')
+                #b.pop(ind + 1)
+
 
         flag = False #возвращаем его в прошлое значение
 
@@ -205,26 +214,39 @@ for i in posl:
     primer1.insert(i, '!') #и заменяем те знаки, которые мы уже занесли в последовательность на !
     primer1.pop(i+1) #чтобы не заносить их дважды
 
+
 '''РАССТАВЛЯЕМ ПРИОРИТЕТ ЗНАКОВ'''
 
 posled = prior(primer1, posled) #создаем общую последовательность из индексов
 posl += posled #объединяем и получаем общую последовательность
 
+for i in posl: #перебираем
+    for l in range(len(posl)): #и перебираем отдельно все последующие индексы
+
+        if i < posl[l]: #если начальные индекс приоритетного знака меньше, то из-за него будут смещаться другие индексы на 2
+            #print(i)
+            #print(posl[l])
+            #print('!!!')
+            posl[l] -= 2 #и мы убираем это
+
 for i in posl:
+
     znak = primer[i]
     for l in primer:
+
         if l == znak: #перебираем знаки приеритета в элементах списка
             ind = i
 
             if znak == '+':
                 primer = sum(primer, ind) #присваеваем то, что нам возвращает функция, чтобы использовать это заново
-            elif znak == '-':
+            if znak == '-':
                 primer = razn(primer, ind)
-            elif znak == '*':
+            if znak == '*':
                 primer = proisv(primer, ind)
-            elif znak == '/':
+            if znak == '/':
                 primer = chast(primer, ind)
-            elif znak == '^':
+            if znak == '^':
                 primer = stepen(primer, ind)
+            break
 
 print(float(primer[0])) #берем единственный элемент нашего списка и выводим его 

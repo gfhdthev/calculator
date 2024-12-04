@@ -131,4 +131,6 @@ for i in posled:
             elif znak == '^':
                 primer = stepen(primer, ind)
 
+            break
+
 print(float(primer[0])) #берем единственный элемент нашего списка и выводим его 
